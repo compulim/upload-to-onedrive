@@ -57,14 +57,18 @@ runs:
 
         FILENAME="${FILE_PATH##*/}"
 
-        LIST_APPROOT_RESPONSE=$(curl \
+        set +e
+
+        APPROOT_RESPONSE=$(curl \
           --fail-with-body \
           --header "Authorization: Bearer $ACCESS_TOKEN" \
-          $API_ENDPOINT/drive/special/approot)
+          "$API_ENDPOINT/drive/special/approot")
 
-        echo $LIST_APPROOT_RESPONSE | jq
+        [ $? -eq 0 ] || echo $APPROOT_RESPONSE | jq || exit $?
 
-        APPROOT_ID=$(echo $LIST_APPROOT_RESPONSE | jq -r .id)
+        APPROOT_ID=$(echo $APPROOT_RESPONSE | jq -r .id)
+
+        set -e
 
         echo Item ID for application root is $APPROOT_ID.
 
@@ -73,13 +77,19 @@ runs:
         echo Upload session URL dump
         echo $CREATE_UPLOAD_SESSION_JSON | jq
 
+        set +e
+
         CREATE_UPLOAD_SESSION_RESPONSE=$(curl \
           --fail-with-body \
           --header "Authorization: Bearer $ACCESS_TOKEN" \
           --json "$CREATE_UPLOAD_SESSION_JSON" \
           "$API_ENDPOINT/drive/items/$APPROOT_ID:/$FILENAME:/createUploadSession")
 
+        [ $? -eq 0 ] || echo $CREATE_UPLOAD_SESSION_RESPONSE | jq || exit $?
+
         echo $CREATE_UPLOAD_SESSION_RESPONSE | jq
+
+        set -e
 
         UPLOAD_URL=$(echo $CREATE_UPLOAD_SESSION_RESPONSE | jq -r .uploadUrl)
 
