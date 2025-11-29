@@ -48,7 +48,7 @@ runs:
 
     - name: Upload
       run: |
-        set +H
+        set +He
 
         ACCESS_TOKEN=${{ steps.get-access-token.outputs.access-token }}
         API_ENDPOINT=${{ inputs.api-endpoint }}
