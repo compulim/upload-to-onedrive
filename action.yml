@@ -42,7 +42,7 @@ runs:
       shell: bash
 
     - name: Install tools
-      run: sudo apt install basename jq
+      run: sudo apt install jq
       shell: bash
 
     - name: Upload
@@ -54,8 +54,7 @@ runs:
 
         FILE_PATH=${{ inputs.path }}
 
-        FILENAME=$(basename "$FILE_PATH")
-        # FILENAME="${FILE_PATH##*/}"
+        FILENAME="${FILE_PATH##*/}"
 
         APPROOT_ID=$(curl \
           --header "Authorization: Bearer $ACCESS_TOKEN" \
