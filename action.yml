@@ -31,13 +31,20 @@ runs:
       run: |
         set +H
 
-        ACCESS_TOKEN=$(curl \
+        GET_ACCESS_TOKEN_RESPONSE=$(set +e && curl \
           --data "client_id=${{ inputs.client-id }}" \
           --data "client_secret=${{ inputs.client-secret }}" \
           --data "refresh_token=${{ inputs.refresh-token }}" \
           --data "grant_type=refresh_token" \
           --fail-with-body \
-          "https://login.microsoftonline.com/consumers/oauth2/v2.0/token" | jq -r '.access_token')
+          "https://login.microsoftonline.com/consumers/oauth2/v2.0/token")
+
+        if [ $? -ne 0 ]; then
+          echo $GET_ACCESS_TOKEN_RESPONSE | jq
+          exit $?
+        fi
+
+        ACCESS_TOKEN=$(GET_ACCESS_TOKEN_RESPONSE | jq -r '.access_token')
 
         echo "access-token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
       shell: bash
