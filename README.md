@@ -1,6 +1,6 @@
 # upload-to-onedrive
 
-Upload a single file to OneDrive application folder.
+GitHub action to upload a single file to OneDrive application folder.
 
 ## Step-by-step
 
