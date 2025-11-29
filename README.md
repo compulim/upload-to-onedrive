@@ -2,6 +2,28 @@
 
 GitHub action to upload a single file to OneDrive application folder.
 
+## Inputs
+
+| Name                | Description                                              | Default                       |
+| ------------------- | -------------------------------------------------------- | ----------------------------- |
+| `api-endpoint`      | API endpoint for OneDrive API                            | https://api.onedrive.com/v1.0 |
+| `client-id`         | Application (client) ID                                  | (Required)                    |
+| `client-secret`     | Client secret                                            | (Required)                    |
+| `conflict-behavior` | How to handle conflict ("rename", "fail" or "replace")   | `rename`                      |
+| `path`              | Path of the file to be uploaded                          | (Required)                    |
+| `refresh-token`     | Refresh token from the user consented to the application | (Required)                    |
+
+## Outputs
+
+| Name                | Description                         | Example                                                              |
+| ------------------- | ----------------------------------- | -------------------------------------------------------------------- |
+| `created-date-time` | File creation time in ISO timestamp | `"2025-11-29T11:24:00Z"`                                             |
+| `ctag`              | cTag of the uploaded file           | `"\"c:{12345678-1234-5678-ABCD-12345678ABCD},2\""`                   |
+| `etag`              | ETag of the uploaded file           | `"\"{12345678-1234-5678-ABCD-12345678ABCD},3\""`                     |
+| `item-id`           | Item ID of the uploaded file        | `"0123456789abc!123"`                                                |
+| `quick-xor-hash`    | Quick XOR hash of the uploaded file | `"a+base64+value=="`                                                          |
+| `url`               | URL of the uploaded file            | `"https://onedrive.live.com?cid=0123456789abc&id=0123456789abc!123"` |
+
 ## Step-by-step
 
 ### Obtaining consent and refresh token
@@ -35,11 +57,11 @@ Add the following to your GitHub workflow
 Put the following in your GitHub environment.
 
 - Secrets
-   - `ONEDRIVE_CLIENT_SECRET` with your client secret from Entra ID
-   - `ONEDRIVE_REFRESH_TOKEN` with your refresh token
-      - Should starts with to `M.C...`
+  - `ONEDRIVE_CLIENT_SECRET` with your client secret from Entra ID
+  - `ONEDRIVE_REFRESH_TOKEN` with your refresh token
+    - Should starts with to `M.C...`
 - Variables
-   - `ONEDRIVE_CLIENT_ID` with your application (client) ID from Entra ID
+  - `ONEDRIVE_CLIENT_ID` with your application (client) ID from Entra ID
 
 ## Contributions
 
