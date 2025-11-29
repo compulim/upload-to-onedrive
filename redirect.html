@@ -16,6 +16,11 @@
       input[type='url'] {
         font-size: inherit;
       }
+
+      .redeem-script {
+        height: 200px;
+        width: 600px;
+      }
     </style>
   </head>
   <body>
@@ -34,35 +39,111 @@
   </script>
   <script src="https://esm.sh/tsx" type="module"></script>
   <script type="text/babel">
-    import { useCallback, useMemo, useRef } from 'react';
+    import { useCallback, useEffect, useMemo, useRef } from 'react';
     import { createRoot } from 'react-dom/client';
     import { useRefFrom } from 'use-ref-from';
+    import { useStateWithRef } from 'use-state-with-ref';
 
     function App() {
-      const refreshToken = useMemo(() => {
+      const [accessTokenJSON, setAccessTokenJSON, accessTokenJSONRef] = useStateWithRef('');
+      const [clientId, setClientId, clientIdRef] = useStateWithRef(() => sessionStorage?.getItem('CLIENT_ID') || '');
+      const [clientSecret, setClientSecret, clientSecretRef] = useStateWithRef('');
+
+      const code = useMemo(() => {
         const searchParams = new URLSearchParams(location.search);
 
         return searchParams.get('code');
       }, []);
 
-      const refreshTokenRef = useRefFrom(refreshToken);
+      const refreshTokenRef = useRefFrom(code);
 
-      const handleCopyButtonClick = useCallback(() => {
-        navigator.clipboard?.writeText(refreshToken);
-      }, [refreshTokenRef]);
+      const handleClientIdInput = useCallback(event => setClientId(event.currentTarget.value), [setClientId]);
+      const handleClientSecretInput = useCallback(
+        event => setClientSecret(event.currentTarget.value),
+        [setClientSecret]
+      );
+
+      const handleCopyAccessTokenButtonClick = useCallback(
+        () => navigator.clipboard?.writeText(accessTokenJSONRef.current?.access_token),
+        [accessTokenJSONRef]
+      );
+
+      const redeemScript = useMemo(() => {
+        const redirectURI = new URL(location.href);
+
+        redirectURI.search = '';
+
+        const body = new Map();
+
+        body.set('client_id', clientId);
+        body.set('client_secret', clientSecret);
+        body.set('code', code);
+        body.set('grant_type', 'authorization_code');
+        body.set('redirect_uri', redirectURI.href);
+
+        const lines = ['curl'];
+
+        lines.push(`  ${new URL('https://login.live.com/oauth20_token.srf')}`);
+        lines.push('  -X POST');
+        lines.push("  -H 'Content-Type: application/x-www-form-urlencoded'");
+
+        for (const [name, value] of body) {
+          // Escape ! so it don't trigger "history expansion" in shell script.
+          lines.push(`  -d "${encodeURIComponent(name)}=${encodeURIComponent(value).replace(/!/gu, '\\!')}"`);
+        }
+
+        lines.push('  | jq');
+
+        return lines.join(' \\\n');
+      }, [clientId, clientSecret, setAccessTokenJSON]);
+
+      useEffect(() => {
+        clientId ? sessionStorage?.setItem('CLIENT_ID', clientId) : sessionStorage?.removeItem('CLIENT_ID');
+      }, [clientId]);
 
       return (
         <div>
           <p>
             <label>
-              <div>Refresh token</div>
-              <input autocomplete={false} readonly={true} spellCheck={false} type="text" value={refreshToken} />
+              <div>Code</div>
+              <input autocomplete={false} readonly={true} spellCheck={false} type="text" value={code} />
             </label>
           </p>
           <p>
-            <button onClick={handleCopyButtonClick} type="button">
-              Copy
-            </button>
+            <label>
+              <div>Client ID</div>
+              <input
+                autocomplete={false}
+                onInput={handleClientIdInput}
+                spellCheck={false}
+                type="text"
+                value={clientId}
+              />
+            </label>
+          </p>
+          <p>
+            <label>
+              <div>Client Secret</div>
+              <input
+                autocomplete={false}
+                onInput={handleClientSecretInput}
+                spellCheck={false}
+                type="password"
+                value={clientSecret}
+              />
+            </label>
+          </p>
+          <p>
+            <label>
+              <div>Run cURL</div>
+              <textarea
+                autocomplete={false}
+                className="redeem-script"
+                readonly={true}
+                spellCheck={false}
+                value={redeemScript}
+              />
+            </label>
           </p>
         </div>
       );
