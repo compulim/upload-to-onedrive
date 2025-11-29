@@ -26,12 +26,12 @@ runs:
         set +H
 
         ACCESS_TOKEN=$(curl \
-          --request POST \
           --data "client_id=${{ inputs.client-id }}" \
           --data "client_secret=${{ inputs.client-secret }}" \
           --data "refresh_token=${{ inputs.refresh-token }}" \
           --data "grant_type=refresh_token" \
-          "https://login.microsoftonline.com/common/oauth2/v2.0/token" | jq -r '.access_token')
+          --verbose \
+          "https://login.microsoftonline.com/consumers/oauth2/v2.0/token" | jq -r '.access_token')
 
         echo "access-token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
       shell: bash
@@ -45,5 +45,6 @@ runs:
           --header "Content-Type: application/octet-stream" \
           --request PUT \
           --upload-file "${{ inputs.path }}" \
+          --verbose \
           "https://graph.microsoft.com/v1.0/me/drive/root:${{ inputs.onedrive-path }}:/content"
       shell: bash
