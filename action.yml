@@ -80,8 +80,8 @@ runs:
         echo "folder-item-id=$FOLDER_ITEM_ID" | tee --append $GITHUB_OUTPUT
       shell: bash
 
-    - id: create-upload-session
-      name: Create upload session
+    - id: upload-file
+      name: Upload file
       run: |
         set +H
 
@@ -92,6 +92,9 @@ runs:
         FOLDER_ITEM_ID=${{ steps.get-upload-folder.outputs.folder-item-id }}
 
         FILENAME="${FILE_PATH##*/}"
+        FILE_SIZE=$(stat -c%s "$FILE_PATH")
+
+        FILE_SIZE_MINUS_ONE=$((FILE_SIZE - 1))
 
         CREATE_UPLOAD_SESSION_JSON=$(jq \
           -n \
@@ -108,21 +111,6 @@ runs:
           --json "$CREATE_UPLOAD_SESSION_JSON" \
           "$API_ENDPOINT/drive/items/$FOLDER_ITEM_ID:/$FILENAME:/createUploadSession" | jq -r .uploadUrl
         )
-
-        echo "url=$UPLOAD_URL" | tee --append $GITHUB_OUTPUT
-      shell: bash
-
-    - id: upload-file
-      name: Upload file
-      run: |
-        set +H
-
-        FILE_PATH=${{ inputs.path }}
-        UPLOAD_URL=${{ steps.create-upload-session.outputs.url }}
-
-        FILE_SIZE=$(stat -c%s "$FILE_PATH")
-
-        FILE_SIZE_MINUS_ONE=$((FILE_SIZE - 1))
 
         curl \
           --fail-with-body \
