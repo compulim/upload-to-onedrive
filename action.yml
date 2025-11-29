@@ -62,6 +62,8 @@ runs:
           --header "Authorization: Bearer $ACCESS_TOKEN" \
           $API_ENDPOINT/drive/special/approot)
 
+        echo $LIST_APPROOT_RESPONSE | jq
+
         APPROOT_ID=$(echo $LIST_APPROOT_RESPONSE | jq -r .id)
 
         echo Item ID for application root is $APPROOT_ID.
@@ -77,7 +79,7 @@ runs:
           --json "$CREATE_UPLOAD_SESSION_JSON" \
           "$API_ENDPOINT/drive/items/$APPROOT_ID:/$FILENAME:/createUploadSession")
 
-        echo $CREATE_UPLOAD_SESSION_RESPONSE
+        echo $CREATE_UPLOAD_SESSION_RESPONSE | jq
 
         UPLOAD_URL=$(echo $CREATE_UPLOAD_SESSION_RESPONSE | jq -r .uploadUrl)
 
