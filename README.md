@@ -4,14 +4,17 @@ GitHub action to upload a single file to OneDrive application folder.
 
 ## Inputs
 
-| Name                | Description                                              | Default                       |
-| ------------------- | -------------------------------------------------------- | ----------------------------- |
-| `api-endpoint`      | API endpoint for OneDrive API                            | https://api.onedrive.com/v1.0 |
-| `client-id`         | Application (client) ID                                  | (Required)                    |
-| `client-secret`     | Client secret                                            | (Required)                    |
-| `conflict-behavior` | How to handle conflict ("rename", "fail" or "replace")   | `rename`                      |
-| `path`              | Path of the file to be uploaded                          | (Required)                    |
-| `refresh-token`     | Refresh token from the user consented to the application | (Required)                    |
+| Name                | Description                                                | Default                       |
+| ------------------- | ---------------------------------------------------------- | ----------------------------- |
+| `api-endpoint`      | API endpoint for OneDrive API                              | https://api.onedrive.com/v1.0 |
+| `client-id`         | Application (client) ID                                    | (Required)                    |
+| `client-secret`     | Client secret                                              | (Required)                    |
+| `conflict-behavior` | How to handle conflict ("rename", "fail" or "replace")     | `rename`                      |
+| `path`              | Path of the file to be uploaded                            | (Required)                    |
+| `refresh-token`     | Refresh token from the user consented to the application   | (Required)                    |
+| `tenant-id`         | Tenant ID for OAuth, use "consumers" for OneDrive Personal | `consumers`                   |
+
+Note: it seems conflict behavior is not honored in OneDrive Personal as it supports version history.
 
 ## Outputs
 
@@ -66,10 +69,12 @@ Adds the following in your GitHub environment.
 ## Roadmap
 
 - [ ] Release deployment
+  - [ ] Enable release immutability
+- [ ] Put on GitHub Action Marketplace
 - [ ] Support glob for uploading multiple files
   - How should we return the output values?
   - [ ] Support directory hierarchy
-- [ ] Support multi-tenant
+- [x] Support multi-tenant
 - [ ] Automated testing against OneDrive Personal
 - [ ] Automated testing against OneDrive for Business
 

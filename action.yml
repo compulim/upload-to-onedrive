@@ -21,6 +21,10 @@ inputs:
   refresh-token:
     required: true
 
+  tenant-id:
+    default: consumers
+    description: Tenant ID, use "consumers" for OneDrive Personal
+
 outputs:
   created-date-time:
     value: ${{ steps.upload-file.outputs.created-date-time }}
@@ -54,7 +58,7 @@ runs:
           --data "refresh_token=${{ inputs.refresh-token }}" \
           --data "grant_type=refresh_token" \
           --fail-with-body \
-          "https://login.microsoftonline.com/consumers/oauth2/v2.0/token" | jq -r '.access_token')
+          "https://login.microsoftonline.com/${{ inputs.tenant-id }}/oauth2/v2.0/token" | jq -r '.access_token')
 
         echo "access-token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
         echo "::add-mask::$ACCESS_TOKEN"
