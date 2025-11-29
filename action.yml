@@ -36,6 +36,7 @@ runs:
           --data "client_secret=${{ inputs.client-secret }}" \
           --data "refresh_token=${{ inputs.refresh-token }}" \
           --data "grant_type=refresh_token" \
+          --fail-with-body \
           "https://login.microsoftonline.com/consumers/oauth2/v2.0/token" | jq -r '.access_token')
 
         echo "access-token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
@@ -57,6 +58,7 @@ runs:
         FILENAME="${FILE_PATH##*/}"
 
         APPROOT_ID=$(curl \
+          --fail-with-body \
           --header "Authorization: Bearer $ACCESS_TOKEN" \
           $API_ENDPOINT/drive/special/approot | jq -r .id)
 
@@ -68,6 +70,7 @@ runs:
         echo $CREATE_UPLOAD_SESSION_JSON | jq
 
         UPLOAD_URL=$(curl \
+          --fail-with-body \
           --header "Authorization: Bearer $ACCESS_TOKEN" \
           --json "$CREATE_UPLOAD_SESSION_JSON" \
           "$API_ENDPOINT/drive/items/$APPROOT_ID:/$FILENAME:/createUploadSession" | jq -r .uploadUrl)
@@ -75,6 +78,7 @@ runs:
         echo Upload URL is $UPLOAD_URL.
 
         curl \
+          --fail-with-body \
           --upload-file "$FILE_PATH" \
           "$UPLOAD_URL"
       shell: bash
