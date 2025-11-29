@@ -41,6 +41,9 @@ runs:
         echo "access-token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
       shell: bash
 
+    - name: Install tools
+      run: apt install basename curl jq
+
     - name: Upload
       run: |
         set +H
@@ -48,8 +51,10 @@ runs:
         ACCESS_TOKEN=${{ steps.get-access-token.outputs.access-token }}
         API_ENDPOINT=${{ inputs.api-endpoint }}
 
-        PATH=${{ inputs.path }}
-        FILENAME="${PATH##*/}"
+        FILE_PATH=${{ inputs.path }}
+
+        FILENAME=$(basename "$FILE_PATH")
+        # FILENAME="${FILE_PATH##*/}"
 
         APPROOT_ID=$(curl \
           --header "Authorization: Bearer $ACCESS_TOKEN" \
@@ -70,6 +75,6 @@ runs:
         echo Upload URL is $UPLOAD_URL.
 
         curl \
-          --upload-file "${{ inputs.path }}" \
+          --upload-file "$FILE_PATH" \
           "$UPLOAD_URL"
       shell: bash
