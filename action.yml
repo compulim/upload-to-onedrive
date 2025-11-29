@@ -29,8 +29,8 @@ runs:
           --data "client_id=${{ inputs.client-id }}" \
           --data "client_secret=${{ inputs.client-secret }}" \
           --data "refresh_token=${{ inputs.refresh-token }}" \
-          --data "grant_type=refresh_token" \
-          --verbose \
+          --data "scope=https://graph.microsoft.com/.default" \
+          --data "grant_type=client_credentials" \
           "https://login.microsoftonline.com/consumers/oauth2/v2.0/token" | jq -r '.access_token')
 
         echo "access-token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
@@ -43,8 +43,6 @@ runs:
         curl \
           --header "Authorization: Bearer ${{ steps.get-access-token.outputs.access-token }}" \
           --header "Content-Type: application/octet-stream" \
-          --request PUT \
           --upload-file "${{ inputs.path }}" \
-          --verbose \
           "https://graph.microsoft.com/v1.0/me/drive/root:${{ inputs.onedrive-path }}:/content"
       shell: bash
