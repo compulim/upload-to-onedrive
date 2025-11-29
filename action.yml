@@ -1,0 +1,46 @@
+name: Upload to OneDrive
+description: Upload a file to OneDrive
+
+inputs:
+  client-id:
+    required: true
+
+  client-secret:
+    required: true
+
+  onedrive-path:
+    required: true
+
+  path:
+    required: true
+
+  refresh-token:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Get access token
+      run: |
+        ACCESS_TOKEN=$(curl \
+          --fail-with-body \
+          --header "Content-Type: application/x-www-form-urlencoded" \
+          --request POST \
+          --data "client_id=${{ inputs.client-id }}" \
+          --data "client_secret=${{ inputs.client-secret }}" \
+          --data "refresh_token=${{ inputs.refresh-token }}" \
+          --data "grant_type=refresh_token" \
+          "https://login.microsoftonline.com/common/oauth2/v2.0/token" | jq -r '.access_token')
+        echo "access-token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Upload
+      run: |
+        curl \
+          --fail-with-body \
+          --header "Authorization: Bearer ${{ inputs.token }}" \
+          --header "Content-Type: application/octet-stream" \
+          --request PUT \
+          --upload-file "${{ inputs.path }}" \
+          "https://graph.microsoft.com/v1.0/me/drive/root:${{ inputs.onedrive-path }}:/content"
+      shell: bash

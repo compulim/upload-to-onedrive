@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Display access token</title>
+    <style type="text/css">
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      button,
+      input[type='text'] {
+        font-family: inherit;
+      }
+
+      input[type='text'],
+      input[type='url'] {
+        font-size: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <main></main>
+  </body>
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react",
+        "react-dom": "https://esm.sh/react-dom",
+        "react-dom/*": "https://esm.sh/react-dom/",
+        "use-ref-from": "https://esm.sh/use-ref-from/",
+        "use-state-with-ref": "https://esm.sh/use-state-with-ref"
+      }
+    }
+  </script>
+  <script src="https://esm.sh/tsx" type="module"></script>
+  <script type="text/babel">
+    import { useCallback, useMemo, useRef } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { useRefFrom } from 'use-ref-from';
+
+    function App() {
+      const refreshToken = useMemo(() => {
+        const searchParams = new URLSearchParams(location.search);
+
+        return searchParams.get('code');
+      }, []);
+
+      const refreshTokenRef = useRefFrom(refreshToken);
+
+      const handleCopyButtonClick = useCallback(() => {
+        navigator.clipboard?.writeText(refreshToken);
+      }, [refreshTokenRef]);
+
+      return (
+        <div>
+          <p>
+            <label>
+              <div>Refresh token</div>
+              <input autocomplete={false} readonly={true} spellCheck={false} type="text" value={refreshToken} />
+            </label>
+          </p>
+          <p>
+            <button onClick={handleCopyButtonClick} type="button">
+              Copy
+            </button>
+          </p>
+        </div>
+      );
+    }
+
+    const mainElement = document.querySelector('main');
+
+    mainElement && createRoot(mainElement).render(<App />);
+  </script>
+</html>
