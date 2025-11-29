@@ -26,8 +26,6 @@ runs:
         set +H
 
         ACCESS_TOKEN=$(curl \
-          --fail-with-body \
-          --header "Content-Type: application/x-www-form-urlencoded" \
           --request POST \
           --data "client_id=${{ inputs.client-id }}" \
           --data "client_secret=${{ inputs.client-secret }}" \
@@ -43,7 +41,6 @@ runs:
         set +H
 
         curl \
-          --fail-with-body \
           --header "Authorization: Bearer ${{ steps.get-access-token.outputs.access-token }}" \
           --header "Content-Type: application/octet-stream" \
           --request PUT \
