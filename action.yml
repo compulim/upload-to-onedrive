@@ -86,7 +86,7 @@ runs:
 
         CREATE_UPLOAD_SESSION_JSON=$(jq \
           -n \
-          --arg conflict-behavior "$CONFLICT_BEHAVIOR" \
+          --arg conflictBehavior "$CONFLICT_BEHAVIOR" \
           --arg description "$FILE_DESCRIPTION" \
           --arg filename "$FILENAME" \
           '{item:{ "@microsoft.graph.conflictBehavior": $conflictBehavior, description: $description, name: $filename}}'
