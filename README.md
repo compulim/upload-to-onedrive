@@ -15,14 +15,14 @@ GitHub action to upload a single file to OneDrive application folder.
 
 ## Outputs
 
-| Name                | Description                         | Example                                                              |
-| ------------------- | ----------------------------------- | -------------------------------------------------------------------- |
-| `created-date-time` | File creation time in ISO timestamp | `"2025-11-29T11:24:00Z"`                                             |
-| `ctag`              | cTag of the uploaded file           | `"\"c:{12345678-1234-5678-ABCD-12345678ABCD},2\""`                   |
-| `etag`              | ETag of the uploaded file           | `"\"{12345678-1234-5678-ABCD-12345678ABCD},3\""`                     |
-| `item-id`           | Item ID of the uploaded file        | `"0123456789abc!123"`                                                |
-| `quick-xor-hash`    | Quick XOR hash of the uploaded file | `"a+base64+value=="`                                                          |
-| `url`               | URL of the uploaded file            | `"https://onedrive.live.com?cid=0123456789abc&id=0123456789abc!123"` |
+| Name                | Description                                           | Example                                                              |
+| ------------------- | ----------------------------------------------------- | -------------------------------------------------------------------- |
+| `created-date-time` | File creation time in ISO timestamp                   | `"2025-11-29T11:24:00Z"`                                             |
+| `ctag`              | ETag of the content of the uploaded file              | `"\"c:{12345678-1234-5678-ABCD-12345678ABCD},2\""`                   |
+| `etag`              | ETag of the content and metadata of the uploaded file | `"\"{12345678-1234-5678-ABCD-12345678ABCD},3\""`                     |
+| `item-id`           | Item ID of the uploaded file                          | `"0123456789abc!123"`                                                |
+| `quick-xor-hash`    | Quick XOR hash of the uploaded file                   | `"a+base64+value=="`                                                 |
+| `url`               | URL of the uploaded file                              | `"https://onedrive.live.com?cid=0123456789abc&id=0123456789abc!123"` |
 
 ## Step-by-step
 
