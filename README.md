@@ -26,11 +26,11 @@ GitHub action to upload a single file to OneDrive application folder.
 
 ## Step-by-step
 
-### Obtaining consent and refresh token
+### Obtain a refresh token
 
-1. Create Entra ID Application Registration
+1. Create Entra ID application registration
    - Follow the [official instruction](https://learn.microsoft.com/en-us/graph/auth-register-app-v2)
-   - Redirect URI set to https://compulim.github.io/upload-to-onedrive/redirect
+   - Set the "Redirect URI" to https://compulim.github.io/upload-to-onedrive/redirect
 2. Go to https://compulim.github.io/upload-to-onedrive/
    - Paste your application (client) ID
    - Click "Authorize"
@@ -43,7 +43,7 @@ GitHub action to upload a single file to OneDrive application folder.
 
 ### Set up GitHub workflow
 
-Add the following to your GitHub workflow
+Adds the following to your GitHub workflow.
 
 ```yaml
 - uses: compulim/upload-to-onedrive@main
@@ -54,7 +54,7 @@ Add the following to your GitHub workflow
     refresh-token: ${{ secrets.ONEDRIVE_REFRESH_TOKEN }}
 ```
 
-Put the following in your GitHub environment.
+Adds the following in your GitHub environment.
 
 - Secrets
   - `ONEDRIVE_CLIENT_SECRET` with your client secret from Entra ID
@@ -68,7 +68,8 @@ Put the following in your GitHub environment.
 - [ ] Release deployment
 - [ ] Support glob for uploading multiple files
   - How should we return the output values?
-- [ ] Support directory hierarchy
+  - [ ] Support directory hierarchy
+- [ ] Support multi-tenant
 - [ ] Automated testing against OneDrive Personal
 - [ ] Automated testing against OneDrive for Business
 
