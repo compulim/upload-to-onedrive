@@ -20,7 +20,8 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Get access token
+    - id: get-access-token
+      name: Get access token
       run: |
         ACCESS_TOKEN=$(curl \
           --fail-with-body \
@@ -38,7 +39,7 @@ runs:
       run: |
         curl \
           --fail-with-body \
-          --header "Authorization: Bearer ${{ inputs.token }}" \
+          --header "Authorization: Bearer ${{ steps.get-access-token.outputs.access-token }}" \
           --header "Content-Type: application/octet-stream" \
           --request PUT \
           --upload-file "${{ inputs.path }}" \
