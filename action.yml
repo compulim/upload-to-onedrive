@@ -43,6 +43,7 @@ runs:
 
     - name: Install tools
       run: apt install basename curl jq
+      shell: bash
 
     - name: Upload
       run: |
