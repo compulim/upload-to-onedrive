@@ -11,11 +11,12 @@ inputs:
   client-secret:
     required: true
 
-  filename:
-    required: true
+  conflict-behavior:
+    default: rename
+    description: Either "rename", "fail" or "replace"
 
-  onedrive-path:
-    required: true
+  file-description:
+    description: File description (OneDrive Personal only)
 
   path:
     required: true
@@ -47,6 +48,7 @@ runs:
         ACCESS_TOKEN=$(echo $GET_ACCESS_TOKEN_RESPONSE | jq -r '.access_token')
 
         echo "access-token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
+        echo "::add-mask::$ACCESS_TOKEN"
       shell: bash
 
     - name: Install tools
@@ -59,27 +61,36 @@ runs:
 
         ACCESS_TOKEN=${{ steps.get-access-token.outputs.access-token }}
         API_ENDPOINT=${{ inputs.api-endpoint }}
+        CONFLICT_BEHAVIOR=${{ inputs.conflict-behavior }}
+        FILE_DESCRIPTION=${{ inputs.file-description }}
         FILE_PATH=${{ inputs.path }}
 
         FILENAME="${FILE_PATH##*/}"
         FILE_SIZE=$(stat -c%s "$FILE_PATH")
         FILE_SIZE_MINUS_ONE=$((FILE_SIZE - 1))
 
-        APPROOT_RESPONSE=$(set +e && curl \
+        GET_UPLOADING_FOLDER_ITEMID_RESPONSE=$(set +e && curl \
           --fail-with-body \
           --header "Authorization: Bearer $ACCESS_TOKEN" \
-          "$API_ENDPOINT/drive/special/approot")
+          "$API_ENDPOINT/drive/special/approot"
+        )
 
         if [ $? -ne 0 ]; then
-          echo $APPROOT_RESPONSE | jq
+          echo $GET_UPLOADING_FOLDER_ITEMID_RESPONSE | jq
           exit $?
         fi
 
-        APPROOT_ID=$(echo $APPROOT_RESPONSE | jq -r .id)
+        UPLOADING_FOLDER_ITEMID=$(echo $GET_UPLOADING_FOLDER_ITEMID_RESPONSE | jq -r .id)
 
-        echo Item ID for application root is $APPROOT_ID.
+        echo Item ID of uploading folder is $UPLOADING_FOLDER_ITEMID.
 
-        CREATE_UPLOAD_SESSION_JSON=$(jq -n --arg filename "$FILENAME" '{item:{name: $filename}}')
+        CREATE_UPLOAD_SESSION_JSON=$(jq \
+          -n \
+          --arg conflict-behavior "$CONFLICT_BEHAVIOR" \
+          --arg description "$FILE_DESCRIPTION" \
+          --arg filename "$FILENAME" \
+          '{item:{ "@microsoft.graph.conflictBehavior": $conflictBehavior, description: $description, name: $filename}}'
+        )
 
         echo Upload session URL dump
         echo $CREATE_UPLOAD_SESSION_JSON | jq
@@ -88,7 +99,8 @@ runs:
           --fail-with-body \
           --header "Authorization: Bearer $ACCESS_TOKEN" \
           --json "$CREATE_UPLOAD_SESSION_JSON" \
-          "$API_ENDPOINT/drive/items/$APPROOT_ID:/$FILENAME:/createUploadSession")
+          "$API_ENDPOINT/drive/items/$UPLOADING_FOLDER_ITEMID:/$FILENAME:/createUploadSession"
+        )
 
         if [ $? -ne 0 ]; then
           echo $CREATE_UPLOAD_SESSION_RESPONSE | jq
