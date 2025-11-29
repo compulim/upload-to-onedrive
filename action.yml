@@ -42,7 +42,7 @@ runs:
       shell: bash
 
     - name: Install tools
-      run: apt install basename curl jq
+      run: sudo apt install basename jq
       shell: bash
 
     - name: Upload
