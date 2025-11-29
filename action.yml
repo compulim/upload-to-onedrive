@@ -49,7 +49,7 @@ runs:
         API_ENDPOINT=${{ inputs.api-endpoint }}
 
         PATH=${{ inputs.path }}
-        FILENAME=$(basename "$PATH")
+        FILENAME="${PATH##*/}"
 
         APPROOT_ID=$(curl \
           --header "Authorization: Bearer $ACCESS_TOKEN" \
