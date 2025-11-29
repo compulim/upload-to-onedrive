@@ -75,8 +75,8 @@
 
         const body = new Map();
 
-        body.set('client_id', clientId || '<your-client-id>');
-        body.set('client_secret', clientSecret || '<your-client-secret>');
+        body.set('client_id', clientId || 'XXXXXXXXXX');
+        body.set('client_secret', clientSecret || 'XXXXXXXXXX');
         body.set('code', code);
         body.set('grant_type', 'authorization_code');
         body.set('redirect_uri', redirectURI.href);
