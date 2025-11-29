@@ -1,5 +1,5 @@
-name: Upload to OneDrive
-description: Upload a file to OneDrive
+name: Manual upload to OneDrive
+description: Upload a file to OneDrive manually
 
 inputs:
   api-endpoint:
@@ -14,6 +14,10 @@ inputs:
   conflict-behavior:
     default: rename
     description: Either "rename", "fail" or "replace"
+
+  description:
+    default: "-"
+    description: File description (applicable to OneDrive Personal only)
 
   path:
     required: true
@@ -52,6 +56,7 @@ runs:
         ACCESS_TOKEN=${{ steps.get-access-token.outputs.access-token }}
         API_ENDPOINT=${{ inputs.api-endpoint }}
         CONFLICT_BEHAVIOR=${{ inputs.conflict-behavior }}
+        DESCRIPTION=${{ inputs.description }}
         FILE_PATH=${{ inputs.path }}
 
         FILENAME="${FILE_PATH##*/}"
@@ -68,8 +73,9 @@ runs:
         CREATE_UPLOAD_SESSION_JSON=$(jq \
           -n \
           --arg conflictBehavior "$CONFLICT_BEHAVIOR" \
+          --arg description "$DESCRIPTION" \
           --arg filename "$FILENAME" \
-          '{item:{ "@microsoft.graph.conflictBehavior": $conflictBehavior, name: $filename}}'
+          '{item:{ "@microsoft.graph.conflictBehavior": $conflictBehavior, description: $description, name: $filename}}'
         )
 
         echo Upload session URL dump
