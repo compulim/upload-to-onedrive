@@ -63,6 +63,15 @@ Put the following in your GitHub environment.
 - Variables
   - `ONEDRIVE_CLIENT_ID` with your application (client) ID from Entra ID
 
+## Roadmap
+
+- [ ] Release deployment
+- [ ] Support glob for uploading multiple files
+  - How should we return the output values?
+- [ ] Support directory hierarchy
+- [ ] Automated testing against OneDrive Personal
+- [ ] Automated testing against OneDrive for Business
+
 ## Contributions
 
 Like us? [Star](https://github.com/compulim/upload-to-onedrive/stargazers) us.
