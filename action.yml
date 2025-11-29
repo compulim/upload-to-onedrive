@@ -2,10 +2,16 @@ name: Upload to OneDrive
 description: Upload a file to OneDrive
 
 inputs:
+  api-endpoint:
+    default: https://api.onedrive.com/v1.0
+
   client-id:
     required: true
 
   client-secret:
+    required: true
+
+  filename:
     required: true
 
   onedrive-path:
@@ -29,8 +35,7 @@ runs:
           --data "client_id=${{ inputs.client-id }}" \
           --data "client_secret=${{ inputs.client-secret }}" \
           --data "refresh_token=${{ inputs.refresh-token }}" \
-          --data "scope=https://graph.microsoft.com/.default" \
-          --data "grant_type=client_credentials" \
+          --data "grant_type=refresh_token" \
           "https://login.microsoftonline.com/consumers/oauth2/v2.0/token" | jq -r '.access_token')
 
         echo "access-token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
@@ -40,9 +45,31 @@ runs:
       run: |
         set +H
 
+        ACCESS_TOKEN=${{ steps.get-access-token.outputs.access-token }}
+        API_ENDPOINT=${{ inputs.api-endpoint }}
+
+        PATH=${{ inputs.path }}
+        FILENAME=$(basename "$PATH")
+
+        APPROOT_ID=$(curl \
+          --header "Authorization: Bearer $ACCESS_TOKEN" \
+          $API_ENDPOINT/drive/special/approot | jq -r .id)
+
+        echo Item ID for application root is $APPROOT_ID.
+
+        CREATE_UPLOAD_SESSION_JSON=$(jq -n --arg filename "$FILENAME" '{item:{name: $filename}}')
+
+        echo Upload session URL dump
+        echo $CREATE_UPLOAD_SESSION_JSON | jq
+
+        UPLOAD_URL=$(curl \
+          --header "Authorization: Bearer $ACCESS_TOKEN" \
+          --json "$CREATE_UPLOAD_SESSION_JSON" \
+          "$API_ENDPOINT/drive/items/$APPROOT_ID:/$FILENAME:/createUploadSession" | jq -r .uploadUrl)
+
+        echo Upload URL is $UPLOAD_URL.
+
         curl \
-          --header "Authorization: Bearer ${{ steps.get-access-token.outputs.access-token }}" \
-          --header "Content-Type: application/octet-stream" \
           --upload-file "${{ inputs.path }}" \
-          "https://graph.microsoft.com/v1.0/me/drive/root:${{ inputs.onedrive-path }}:/content"
+          "$UPLOAD_URL"
       shell: bash
