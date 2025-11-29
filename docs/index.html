@@ -57,7 +57,7 @@
 
     function App() {
       const [clientId, setClientId, clientIdRef] = useStateWithRef(() => sessionStorage?.getItem('CLIENT_ID') || '');
-      const [redirectURI, setRedirectURI, redirectURIRef] = useStateWithRef(new URL('./redirect.html', location).href);
+      const [redirectURI, setRedirectURI, redirectURIRef] = useStateWithRef(new URL('./redirect', location).href);
       const [scopeMap, setScopeMap, scopeMapRef] = useStateWithRef(
         Object.freeze(
           new Map([
