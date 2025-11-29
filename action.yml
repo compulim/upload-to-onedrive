@@ -59,10 +59,10 @@ runs:
 
         ACCESS_TOKEN=${{ steps.get-access-token.outputs.access-token }}
         API_ENDPOINT=${{ inputs.api-endpoint }}
-
         FILE_PATH=${{ inputs.path }}
 
         FILENAME="${FILE_PATH##*/}"
+        FILE_SIZE=$(stat -c%s "$FILE_PATH")
 
         APPROOT_RESPONSE=$(set +e && curl \
           --fail-with-body \
@@ -102,6 +102,7 @@ runs:
 
         curl \
           --fail-with-body \
+          --header "Content-Range: bytes 0-$FILE_SIZE/$FILE_SIZE" \
           --upload-file "$FILE_PATH" \
           "$UPLOAD_URL"
       shell: bash
