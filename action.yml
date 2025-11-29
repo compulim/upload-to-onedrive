@@ -44,7 +44,7 @@ runs:
           exit $?
         fi
 
-        ACCESS_TOKEN=$(GET_ACCESS_TOKEN_RESPONSE | jq -r '.access_token')
+        ACCESS_TOKEN=$(echo $GET_ACCESS_TOKEN_RESPONSE | jq -r '.access_token')
 
         echo "access-token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
       shell: bash
