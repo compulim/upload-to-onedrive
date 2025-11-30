@@ -70,7 +70,8 @@ Adds the following in your GitHub environment.
 
 - [ ] Release deployment
   - [ ] Enable release immutability
-- [ ] Put on GitHub Action Marketplace
+- [ ] Publish to GitHub Action Marketplace
+- [ ] Support [folder via URL](https://learn.microsoft.com/en-us/onedrive/developer/rest-api/api/driveitem_get?view=odsp-graph-online) instead of hardcoded to [/drive/special/approot](https://learn.microsoft.com/en-us/onedrive/developer/rest-api/concepts/special-folders-appfolder?view=odsp-graph-online)
 - [ ] Support glob for uploading multiple files
   - How should we return the output values?
   - [ ] Support directory hierarchy
