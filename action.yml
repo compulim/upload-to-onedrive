@@ -50,12 +50,25 @@ runs:
     - id: get-access-token
       name: Get access token
       run: |
-        set +H
+        CLIENT_ID=$(cat <<'EOF'
+        ${{ inputs.client-id }}
+        EOF
+        )
+
+        CLIENT_SECRET=$(cat <<'EOF'
+        ${{ inputs.client-secret }}
+        EOF
+        )
+
+        REFRESH_TOKEN=$(cat <<'EOF'
+        ${{ inputs.refresh-token }}
+        EOF
+        )
 
         ACCESS_TOKEN=$(curl \
-          --data "client_id=${{ inputs.client-id }}" \
-          --data "client_secret=${{ inputs.client-secret }}" \
-          --data "refresh_token=${{ inputs.refresh-token }}" \
+          --data "client_id=$CLIENT_ID" \
+          --data "client_secret=$CLIENT_SECRET" \
+          --data "refresh_token=$REFRESH_TOKEN" \
           --data "grant_type=refresh_token" \
           --fail-with-body \
           "https://login.microsoftonline.com/${{ inputs.tenant-id }}/oauth2/v2.0/token" | jq -r '.access_token')
@@ -71,10 +84,15 @@ runs:
     - id: get-upload-folder
       name: Get upload folder
       run: |
-        set +H
+        ACCESS_TOKEN=$(cat <<'EOF'
+        ${{ steps.get-access-token.outputs.access-token }}
+        EOF
+        )
 
-        ACCESS_TOKEN=${{ steps.get-access-token.outputs.access-token }}
-        API_ENDPOINT=${{ inputs.api-endpoint }}
+        API_ENDPOINT=$(cat <<'EOF'
+        ${{ inputs.api-endpoint }}
+        EOF
+        )
 
         FOLDER_ITEM_ID=$(curl \
           --fail-with-body \
@@ -87,13 +105,27 @@ runs:
     - id: upload-file
       name: Upload file
       run: |
-        set +H
+        ACCESS_TOKEN=$(cat <<'EOF'
+        ${{ steps.get-access-token.outputs.access-token }}
+        EOF
+        )
 
-        ACCESS_TOKEN=${{ steps.get-access-token.outputs.access-token }}
-        API_ENDPOINT=${{ inputs.api-endpoint }}
+        API_ENDPOINT=$(cat <<'EOF'
+        ${{ inputs.api-endpoint }}
+        EOF
+        )
+
         CONFLICT_BEHAVIOR=${{ inputs.conflict-behavior }}
-        FILE_PATH=${{ inputs.path }}
-        FOLDER_ITEM_ID=${{ steps.get-upload-folder.outputs.folder-item-id }}
+
+        FILE_PATH=$(cat <<'EOF'
+        ${{ inputs.path }}
+        EOF
+        )
+
+        FOLDER_ITEM_ID=$(cat <<'EOF'
+        ${{ steps.get-upload-folder.outputs.folder-item-id }}
+        EOF
+        )
 
         FILENAME="${FILE_PATH##*/}"
         FILE_SIZE=$(stat -c%s "$FILE_PATH")
